@@ -224,7 +224,7 @@ function codemap(rootMap) {
       if (pointerValue) {
         return path.get(pointerValue);
       }
-      return typeof path.value === 'function' && path.value.name === 'container' ? path.value.call(app, path.get) : path.value;
+      return typeof path.value === 'function' && path.value.name === 'container' ? path.value.call(app, path.get, path.set) : path.value;
     },
     validatePathCache: function validatePathCache() {
       Object.keys(app._pathCache).forEach(function (p) {
