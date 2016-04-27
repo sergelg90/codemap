@@ -1,0 +1,26 @@
+{
+  "name": "codemap",
+  "version": "1.0.0",
+  "description": "a spec for organizing and re-using tool, feature, and application code",
+  "main": "index.js",
+  "dependencies": {
+    "n-deep-merge": "0.0.1"
+  },
+  "devDependencies": {
+    "mocha": "^2.4.5"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec"
+  },
+  "keywords": [
+    "plugin",
+    "hook",
+    "application",
+    "architecture",
+    "compose",
+    "composable",
+    "features"
+  ],
+  "author": "Carlos Rodriguez <carlos@s8f.org> (http://s8f.org/)",
+  "license": "MIT"
+}
