@@ -5,7 +5,7 @@ PlainObject.prototype = Object.create(null);
 
 module.exports = codemap;
 
-function codemap(map) {
+function codemap(rootMap) {
   var app = {
     plainObject: function plainObject() {
       return new PlainObject();
@@ -22,6 +22,9 @@ function codemap(map) {
           map: map,
           get: function get(p) {
             return app.get(p, map._ns);
+          },
+          set: function set(p, val) {
+            return app.set(p, val, map._ns);
           }
         };
       }
@@ -36,6 +39,9 @@ function codemap(map) {
           map: map,
           get: function get(p) {
             return app.get(p, map._ns);
+          },
+          set: function set(p, val) {
+            return app.set(p, val, map._ns);
           }
         };
       }
@@ -50,6 +56,9 @@ function codemap(map) {
           map: map,
           get: function get(p) {
             return app.get(p, map._ns);
+          },
+          set: function set(p, val) {
+            return app.set(p, val, map._ns);
           }
         };
       }
@@ -67,10 +76,13 @@ function codemap(map) {
         map: map,
         get: function get(p) {
           return app.get(p, map._ns);
+        },
+        set: function set(p, val) {
+          return app.set(p, val, map._ns);
         }
       };
     },
-    parseMap: function parsemap(map) {
+    parseMap: function parseMap(map) {
       if (map['_maps']) {
         map['_maps'].forEach(function (map) {
           app.parseMap(map);
@@ -89,13 +101,18 @@ function codemap(map) {
         app._pathCache[p] = [];
       }
       app._pathCache[p].push(parsed);
+      return p;
     },
     getPathCache: function getPathCache(p) {
       return app._pathCache[p] || [];
     },
-    resetCache: function resetCache() {
-      app._pathCache = app.plainObject();
-      app._valCache = app.plainObject();
+    clearCache: function clearCache(p) {
+      if (typeof p === 'undefined') {
+        app._valCache = app.plainObject();
+      }
+      else if (typeof p === 'string') {
+        delete app._valCache[p];
+      }
     },
     addValCache: function addValCache(p, val) {
       app._valCache[p] = val;
@@ -103,8 +120,22 @@ function codemap(map) {
     getValCache: function getValCache(p) {
       return app._valCache[p];
     },
+    set: function set(p, val, defaultNs) {
+      if (!defaultNs) defaultNs = rootMap._ns;
+      var map = {_ns: defaultNs};
+      map[p] = val;
+      var parsed = app.parsePath(p, map);
+      if (parsed) {
+        var key = app.addPathCache(parsed);
+        app.clearCache(key);
+      }
+      else {
+        var err = new Error('invalid path `' + p + '`');
+        throw err;
+      }
+    },
     get: function get(p, defaultNs) {
-      if (!defaultNs) defaultNs = map._ns;
+      if (!defaultNs) defaultNs = rootMap._ns;
       if (defaultNs && p.indexOf(':') === -1) {
         p = defaultNs + ':' + p;
       }
@@ -250,9 +281,9 @@ function codemap(map) {
     export: function _export() {
       var ret = app.plainObject();
       var pathStrings = [];
-      Object.keys(map).forEach(function (k) {
-        var path = app.parsePath(k, map);
-        if (path && (!path.ns || path.ns === map._ns)) {
+      Object.keys(rootMap).forEach(function (k) {
+        var path = app.parsePath(k, rootMap);
+        if (path && (!path.ns || path.ns === rootMap._ns)) {
           var p = path.ns ? path.ns + ':' + path.pointer : path.pointer;
           if (pathStrings.indexOf(p) === -1) {
             pathStrings.push(p);
@@ -280,8 +311,9 @@ function codemap(map) {
     }
   };
 
-  app.resetCache();
-  app.parseMap(map);
+  app._pathCache = app.plainObject();
+  app.clearCache();
+  app.parseMap(rootMap);
   app.validatePathCache();
 
   return app;
