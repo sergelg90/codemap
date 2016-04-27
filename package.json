@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "a spec for organizing and re-using tool, feature, and application code",
   "main": "index.js",
-  "dependencies": {
-    "n-deep-merge": "0.0.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "mocha": "^2.4.5"
   },

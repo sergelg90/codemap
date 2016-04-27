@@ -1,12 +1,36 @@
-var merge = require('n-deep-merge');
-
 function PlainObject() {}
 PlainObject.prototype = Object.create(null);
+
+isObject = function (val) {
+  return toString.call(val) === '[object Object]';
+}
+
+isArray = function (val) {
+  return toString.call(val) === '[object Array]';
+}
 
 module.exports = codemap;
 
 function codemap(rootMap) {
   var app = {
+    merge: function merge(a, b) {
+      if (isObject(a) && isObject(b)) {
+        Object.keys(b).forEach(function (i) {
+          if (isObject(a[i]) && isObject(b[i])) {
+            a[i] = app.merge(a[i], b[i]);
+          } else if (isArray(a[i]) && isArray(b[i])) {
+            a[i] = a[i].concat(b[i]);
+          } else {
+            a[i] = b[i];
+          }
+        });
+      } else if (isArray(a) && isArray(b)) {
+        a = a.concat(b);
+      } else {
+        a = b;
+      }
+      return a;
+    },
     plainObject: function plainObject() {
       return new PlainObject();
     },
@@ -128,6 +152,7 @@ function codemap(rootMap) {
       if (parsed) {
         var key = app.addPathCache(parsed);
         app.clearCache(key);
+        app.validatePathCache();
       }
       else {
         var err = new Error('invalid path `' + p + '`');
@@ -164,7 +189,7 @@ function codemap(rootMap) {
             break;
           case 'push':
             if (!val) val = [];
-            if (toString.call(val) !== '[object Array]') {
+            if (!isArray(val)) {
               var _err2 = new Error('cannot push to non-array `' + p + '`');
               _err2.val = val;
               _err2.tmp = tmp;
@@ -175,14 +200,14 @@ function codemap(rootMap) {
             break;
           case 'merge':
             if (!val) val = app.plainObject();
-            if (toString.call(val) !== '[object Object]' || toString.call(tmp) !== '[object Object]') {
+            if (!isObject(val) || !isObject(tmp)) {
               var _err3 = new Error('cannot merge non-object-literal `' + p + '`');
               _err3.val = val;
               _err3.tmp = tmp;
               _err3.path = path;
               throw _err3;
             }
-            val = merge(val, tmp);
+            val = app.merge(val, tmp);
             break;
           case 'alter':
             if (typeof tmp === 'function' && tmp.name === 'alter') {

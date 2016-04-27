@@ -19,13 +19,13 @@ describe('examples', function () {
   it('merge', function () {
     var app = codemap(require('./maps/example_merge'));
     var val = app.get('some.thing');
-    assert.deepEqual(val, {a: 1, b: 4, c: 10, d: {e: 'h', g: true}});
+    assert.deepEqual(val, {a: 0, b: 4, c: 10, d: {e: 'h', g: true}});
     app.set('some.thing{}', {
       d: 6,
       x: 'xx'
     });
     var val = app.get('some.thing');
-    assert.deepEqual(val, {a: 1, b: 4, c: 10, d: {e: 'h', g: true}, x: 'xx'});
+    assert.deepEqual(val, {a: 0, b: 4, c: 10, d: {e: 'h', g: true}, x: 'xx'});
   });
   it('meta', function () {
     var app = codemap(require('./maps/example_meta'));
