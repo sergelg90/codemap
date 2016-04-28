@@ -37,9 +37,10 @@ function codemap(rootMap) {
     parsePath: function parsePath(p, map) {
       var alterMatch = p.match(/^@(?:(.+):)?([^\[]+)(\[(\-?\d*)\])?$/);
       if (alterMatch) {
+        var prefix = !alterMatch[1] && map._folder ? map._folder + '.' : '';
         return {
           ns: alterMatch[1] || map._ns,
-          pointer: alterMatch[2],
+          pointer: prefix + alterMatch[2],
           op: 'alter',
           weight: alterMatch[3] ? parseInt(alterMatch[3].replace(/\[|\]/g, ''), 10) : 0,
           value: map[p],
@@ -54,9 +55,10 @@ function codemap(rootMap) {
       }
       var pushMatch = p.match(/^(?:(.+):)?([^\[]+)\[(\-?\d*)\]$/);
       if (pushMatch) {
+        var prefix = !pushMatch[1] && map._folder ? map._folder + '.' : '';
         return {
           ns: pushMatch[1] || map._ns,
-          pointer: pushMatch[2],
+          pointer: prefix + pushMatch[2],
           op: 'push',
           weight: pushMatch[3] ? parseInt(pushMatch[3].replace(/\[|\]/g, ''), 10) : 0,
           value: map[p],
@@ -71,9 +73,10 @@ function codemap(rootMap) {
       }
       var mergeMatch = p.match(/^(?:(.+):)?([^\{]+)\{(\-?\d*)\}$/);
       if (mergeMatch) {
+        var prefix = !mergeMatch[1] && map._folder ? map._folder + '.' : '';
         return {
           ns: mergeMatch[1] || map._ns,
-          pointer: mergeMatch[2],
+          pointer: prefix + mergeMatch[2],
           op: 'merge',
           weight: mergeMatch[3] ? parseInt(mergeMatch[3].replace(/\{|\}/g, ''), 10) : 0,
           value: map[p],
@@ -92,9 +95,10 @@ function codemap(rootMap) {
         var err = new Error('invalid path `' + p + '`');
         throw err;
       }
+      var prefix = !setMatch[1] && map._folder ? map._folder + '.' : '';
       return {
         ns: setMatch[1] || map._ns,
-        pointer: setMatch[2],
+        pointer: prefix + setMatch[2],
         op: 'set',
         value: map[p],
         map: map,
