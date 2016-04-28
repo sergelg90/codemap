@@ -8,8 +8,9 @@ module.exports = {
   'some.thing[-2]': [
     'first', 'second'
   ],
-  'some.thing': ['zero'],
+  'some.thing': ['#other.thing', 'zero'],
   'some.thing[]': function container (get) {
     return ['third', 'fourth'];
-  }
+  },
+  'other.thing': 'minus-one'
 }

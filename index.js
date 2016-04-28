@@ -9,6 +9,14 @@ isArray = function (val) {
   return toString.call(val) === '[object Array]';
 }
 
+function shallowCopy (obj) {
+  var ret = new PlainObject();
+  Object.keys(obj).forEach(function (k) {
+    ret[k] = obj[k];
+  });
+  return ret;
+}
+
 module.exports = codemap;
 
 function codemap(rootMap) {
@@ -224,11 +232,20 @@ function codemap(rootMap) {
       return val;
     },
     getValue: function getValue(path) {
+      if (isArray(path.value)) {
+        return path.value.map(function (val) {
+          var pathCopy = shallowCopy(path);
+          pathCopy.value = val;
+          return app.getValue(pathCopy);
+        });
+      }
       var pointerValue = app.isPointer(path.value);
       if (pointerValue) {
         return path.get(pointerValue);
       }
-      return typeof path.value === 'function' && path.value.name === 'container' ? path.value.call(app, path.get, path.set) : path.value;
+      return typeof path.value === 'function' && path.value.name === 'container'
+        ? path.value.call(app, path.get, path.set)
+        : path.value;
     },
     validatePathCache: function validatePathCache() {
       Object.keys(app._pathCache).forEach(function (p) {

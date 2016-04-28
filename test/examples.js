@@ -76,6 +76,6 @@ describe('examples', function () {
   it('push', function () {
     var app = codemap(require('./maps/example_push'));
     var val = app.get('some.thing');
-    assert.deepEqual(val, ['zero', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth']);
+    assert.deepEqual(val, ['minus-one', 'zero', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth']);
   });
 });
