@@ -1,6 +1,6 @@
 {
   "name": "codemap",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "a spec for organizing and re-using tool, feature, and application code",
   "main": "index.js",
   "dependencies": {},
