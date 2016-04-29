@@ -47,6 +47,7 @@ function codemap(rootMap) {
       if (alterMatch) {
         var prefix = !alterMatch[1] && map._folder ? map._folder + '.' : '';
         return {
+          p: p,
           ns: alterMatch[1] || map._ns,
           pointer: prefix + alterMatch[2],
           op: 'alter',
@@ -65,6 +66,7 @@ function codemap(rootMap) {
       if (pushMatch) {
         var prefix = !pushMatch[1] && map._folder ? map._folder + '.' : '';
         return {
+          p: p,
           ns: pushMatch[1] || map._ns,
           pointer: prefix + pushMatch[2],
           op: 'push',
@@ -83,6 +85,7 @@ function codemap(rootMap) {
       if (mergeMatch) {
         var prefix = !mergeMatch[1] && map._folder ? map._folder + '.' : '';
         return {
+          p: p,
           ns: mergeMatch[1] || map._ns,
           pointer: prefix + mergeMatch[2],
           op: 'merge',
@@ -105,6 +108,7 @@ function codemap(rootMap) {
       }
       var prefix = !setMatch[1] && map._folder ? map._folder + '.' : '';
       return {
+        p: p,
         ns: setMatch[1] || map._ns,
         pointer: prefix + setMatch[2],
         op: 'set',
