@@ -239,7 +239,7 @@ function codemap(rootMap) {
           return app.getValue(pathCopy);
         });
       }
-      var pointerValue = app.isPointer(path.value);
+      var pointerValue = app.isPointer(path);
       if (pointerValue) {
         return path.get(pointerValue);
       }
@@ -302,7 +302,7 @@ function codemap(rootMap) {
               hasAlter = true;
               break;
           }
-          var pointerValue = app.isPointer(path.value);
+          var pointerValue = app.isPointer(path);
           if (pointerValue && typeof app._pathCache[pointerValue] === 'undefined') {
             var _err7 = new Error('cannot point to undefined path `' + pointerValue + '`');
             _err7.path = p;
@@ -319,10 +319,15 @@ function codemap(rootMap) {
         }
       });
     },
-    isPointer: function isPointer(val) {
-      if (typeof val !== 'string') return false;
-      var pointerMatch = val.match(/^#(.*)$/);
-      return pointerMatch ? pointerMatch[1] : false;
+    isPointer: function isPointer(path) {
+      if (typeof path.value !== 'string') return false;
+      var pointerMatch = path.value.match(/^#(?:(.+):)?(.*)$/);
+      if (pointerMatch) {
+        var ns = pointerMatch[1] || path.ns;
+        var prefix = ns ? ns + ':' : '';
+        return prefix + pointerMatch[2];
+      }
+      return false;
     },
     export: function _export() {
       var ret = app.plainObject();
