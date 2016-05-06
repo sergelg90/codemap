@@ -3,9 +3,12 @@
   "version": "1.2.2",
   "description": "a spec for organizing and re-using tool, feature, and application code",
   "main": "index.js",
-  "dependencies": {},
+  "dependencies": {
+    "debug": "^2.2.0"
+  },
   "devDependencies": {
-    "mocha": "^2.4.5"
+    "mocha": "^2.4.5",
+    "run-series": "^1.1.4"
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec"

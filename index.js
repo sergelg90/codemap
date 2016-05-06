@@ -1,3 +1,5 @@
+var debug = require('debug')('codemap')
+
 function PlainObject() {}
 PlainObject.prototype = Object.create(null);
 
@@ -180,11 +182,11 @@ function codemap(rootMap) {
       if (defaultNs && p.indexOf(':') === -1) {
         p = defaultNs + ':' + p;
       }
-      console.log('GET', p)
+      debug('GET', p)
 
       var cached = app.getValCache(p);
       if (typeof cached !== 'undefined') {
-        console.log('GET', p, 'was cached')
+        debug('GET', p, 'was cached')
         return cached;
       }
       var paths = app.getPathCache(p);
@@ -194,10 +196,10 @@ function codemap(rootMap) {
         throw err;
       }
       var val = null;
-      // console.log(JSON.stringify(paths, null, 2))
+      // debug(JSON.stringify(paths, null, 2))
       paths.forEach(function (path) {
         var tmp = app.getValue(path);
-        console.log('get value', path.p, ' === ', tmp);
+        debug('get value', path.p, ' === ', tmp);
         if (typeof tmp === 'undefined') {
           var _err = new Error('undefined value for `' + p + '`');
           _err.path = path;
@@ -236,17 +238,17 @@ function codemap(rootMap) {
             break;
         }
       });
-      console.log('val', val);
+      debug('val', val);
       app.addValCache(p, val);
       return val;
     },
     getValue: function getValue(path) {
       if (isArray(path.value)) {
-        console.log('resolving array', path.value)
+        debug('resolving array', path.value)
         return path.value.map(function (val) {
           var pathCopy = shallowCopy(path);
           pathCopy.value = val;
-          console.log('path Copy', pathCopy)
+          debug('path Copy', pathCopy)
           return app.getValue(pathCopy);
         });
       }
