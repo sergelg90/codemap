@@ -5,7 +5,7 @@ describe('middleware duping', function () {
   it('does not dupe', function (done) {
     var core = [
       {
-        _ns: 'motley',
+        _ns: 'test',
         _folder: 'hooks',
 
         'listen[]': function container (get) {
@@ -20,7 +20,7 @@ describe('middleware duping', function () {
         }
       },
       {
-        _ns: 'motley',
+        _ns: 'test',
 
         'middleware[-60]': [],
         'middleware[-40]': [],
@@ -37,7 +37,7 @@ describe('middleware duping', function () {
         _maps: core.concat([].slice.call(arguments)),
         'listen': function container (get, set) {
           return function runListen (cb) {
-            require('run-series')(get('motley:hooks.listen'), function (err) {
+            require('run-series')(get('test:hooks.listen'), function (err) {
               if (err) return cb(err)
               set('foo', 'bar')
               cb()
@@ -56,22 +56,22 @@ describe('middleware duping', function () {
     }
 
     var app = motley({
-      _ns: 'motley',
+      _ns: 'test',
       _maps: [
         {
-          _ns: 'motley',
+          _ns: 'test',
           'middleware[]': []
         },
         {
-          _ns: 'motley',
+          _ns: 'test',
           'middleware[]': []
         },
         {
-          _ns: 'motley',
+          _ns: 'test',
           'middleware[-60]': ['buffet']
         },
         {
-          _ns: 'motley',
+          _ns: 'test',
           'middleware.templ': function container (get, set) {
             set('bar', 'baz')
             return 'templ'
@@ -83,7 +83,7 @@ describe('middleware duping', function () {
 
     app.listen(function (err) {
       if (err) return done(err)
-      assert.deepEqual(app.get('motley:middleware'), ['buffet', 'templ', 'foo'])
+      assert.deepEqual(app.get('test:middleware'), ['buffet', 'templ', 'foo'])
       done()
     })
   })

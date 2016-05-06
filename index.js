@@ -133,6 +133,7 @@ function codemap(rootMap) {
       Object.keys(map).forEach(function (p) {
         var parsed = app.parsePath(p, map);
         if (parsed) {
+          debug('adding path cache', parsed)
           app.addPathCache(parsed);
         }
       });
@@ -163,6 +164,7 @@ function codemap(rootMap) {
       return app._valCache[p];
     },
     set: function set(p, val, defaultNs) {
+      debug('SET', p, val, defaultNs)
       if (!defaultNs) defaultNs = rootMap._ns;
       var map = {_ns: defaultNs};
       map[p] = val;
@@ -199,7 +201,7 @@ function codemap(rootMap) {
       // debug(JSON.stringify(paths, null, 2))
       paths.forEach(function (path) {
         var tmp = app.getValue(path);
-        debug('get value', path.p, ' === ', tmp);
+        //debug('get value', path.p, ' === ', tmp);
         if (typeof tmp === 'undefined') {
           var _err = new Error('undefined value for `' + p + '`');
           _err.path = path;
@@ -238,17 +240,17 @@ function codemap(rootMap) {
             break;
         }
       });
-      debug('val', val);
+      //debug('val', val);
       app.addValCache(p, val);
       return val;
     },
     getValue: function getValue(path) {
       if (isArray(path.value)) {
-        debug('resolving array', path.value)
+        //debug('resolving array', path.value)
         return path.value.map(function (val) {
           var pathCopy = shallowCopy(path);
           pathCopy.value = val;
-          debug('path Copy', pathCopy)
+          //debug('path Copy', pathCopy)
           return app.getValue(pathCopy);
         });
       }
