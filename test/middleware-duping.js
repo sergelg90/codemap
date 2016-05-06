@@ -8,15 +8,11 @@ describe('middleware duping', function () {
         _ns: 'test',
         _folder: 'hooks',
 
-        'listen[]': function container (get) {
+        'listen[]': function container (get, set) {
           return function listen (cb) {
-            get('hooks.server')
+            set('123', 'lol')
             cb()
           }
-        },
-        'server': function container (get, set) {
-          set('123', 'lol')
-          return null
         }
       },
       {
