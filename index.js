@@ -20,6 +20,7 @@ function shallowCopy (obj) {
 }
 
 module.exports = codemap;
+var globalId = module.exports.globalId = 0;
 
 function codemap(rootMap) {
   var app = {
@@ -133,7 +134,7 @@ function codemap(rootMap) {
       Object.keys(map).forEach(function (p) {
         var parsed = app.parsePath(p, map);
         if (parsed) {
-          debug('adding path cache', parsed)
+          //debug('adding path cache', parsed)
           app.addPathCache(parsed);
         }
       });
@@ -143,6 +144,7 @@ function codemap(rootMap) {
       if (typeof app._pathCache[p] === 'undefined') {
         app._pathCache[p] = [];
       }
+      parsed.id = globalId++;
       app._pathCache[p].push(parsed);
       return p;
     },
@@ -220,6 +222,7 @@ function codemap(rootMap) {
               _err2.path = path;
               throw _err2;
             }
+            debug('concat', val, tmp)
             val = val.concat(tmp);
             break;
           case 'merge':
@@ -277,6 +280,8 @@ function codemap(rootMap) {
           if (b.op === 'alter' && a.op !== 'alter') return -1;
           if (a.weight < b.weight) return -1;
           if (b.weight < a.weight) return 1;
+          if (a.id < b.id) return -1;
+          if (b.id < a.id) return 1;
           return 0;
         });
 
