@@ -4,11 +4,11 @@ function PlainObject() {}
 PlainObject.prototype = Object.create(null);
 
 isObject = function (val) {
-  return toString.call(val) === '[object Object]';
+  return Object.prototype.toString.call(val) === '[object Object]';
 }
 
 isArray = function (val) {
-  return toString.call(val) === '[object Array]';
+  return Object.prototype.toString.call(val) === '[object Array]';
 }
 
 function shallowCopy (obj) {
