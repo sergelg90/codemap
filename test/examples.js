@@ -78,4 +78,13 @@ describe('examples', function () {
     var val = app.get('some.thing');
     assert.deepEqual(val, ['minus-one', 'zero', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth']);
   });
+  it('clear', function () {
+    var app = codemap(require('./maps/example_clear'));
+    var val = app.get('some.thing.cached');
+    var val2 = app.get('some.thing.cached');
+    assert.equal(val, val2)
+    app.get('clear.the.thing')
+    var val3 = app.get('some.thing.cached');
+    assert(val != val3)
+  })
 });

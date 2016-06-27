@@ -62,6 +62,9 @@ function codemap(rootMap) {
           },
           set: function set(p, val) {
             return app.set(p, val, map._ns);
+          },
+          clear: function clear(p) {
+            return app.clear(p, map._ns);
           }
         };
       }
@@ -81,6 +84,9 @@ function codemap(rootMap) {
           },
           set: function set(p, val) {
             return app.set(p, val, map._ns);
+          },
+          clear: function clear(p) {
+            return app.clear(p, map._ns);
           }
         };
       }
@@ -100,6 +106,9 @@ function codemap(rootMap) {
           },
           set: function set(p, val) {
             return app.set(p, val, map._ns);
+          },
+          clear: function clear(p) {
+            return app.clear(p, map._ns);
           }
         };
       }
@@ -122,6 +131,9 @@ function codemap(rootMap) {
         },
         set: function set(p, val) {
           return app.set(p, val, map._ns);
+        },
+        clear: function clear(p) {
+          return app.clear(p, map._ns);
         }
       };
     },
@@ -164,6 +176,20 @@ function codemap(rootMap) {
     },
     getValCache: function getValCache(p) {
       return app._valCache[p];
+    },
+    clear: function clear(p, defaultNs) {
+      debug('CLEAR', p, defaultNs)
+      if (!defaultNs) defaultNs = rootMap._ns;
+      var map = {_ns: defaultNs};
+      var parsed = app.parsePath(p, map);
+      if (parsed) {
+        var key = parsed.ns ? parsed.ns + ':' + parsed.pointer : parsed.pointer;
+        app.clearCache(key);
+      }
+      else {
+        var err = new Error('invalid path `' + p + '`');
+        throw err;
+      }
     },
     set: function set(p, val, defaultNs) {
       debug('SET', p, val, defaultNs)
@@ -262,7 +288,7 @@ function codemap(rootMap) {
         return path.get(pointerValue);
       }
       return typeof path.value === 'function' && path.value.name === 'container'
-        ? path.value.call(app, path.get, path.set)
+        ? path.value.call(app, path.get, path.set, path.clear)
         : path.value;
     },
     validatePathCache: function validatePathCache() {
