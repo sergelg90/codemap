@@ -1,4 +1,5 @@
 var assert = require('assert');
+var alter = require('../../').alter;
 
 module.exports = {
   _folder: 'some',
@@ -23,8 +24,8 @@ module.exports = {
     assert.equal(typeof this.get, 'function');
     return 'second';
   },
-  '@other.key': function alter (val) {
+  '@other.key': alter(function (val) {
     assert.equal(val, 'second');
     return 'third';
-  }
+  })
 }
