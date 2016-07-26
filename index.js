@@ -207,6 +207,22 @@ function codemap(rootMap) {
         throw err;
       }
     },
+    exists: function exists(p, defaultNs) {
+      if (!defaultNs) defaultNs = rootMap._ns;
+      if (defaultNs && p.indexOf(':') === -1) {
+        p = defaultNs + ':' + p;
+      }
+      debug('EXISTS', p);
+
+      var paths = app.getPathCache(p);
+      if (paths.length) {
+        debug('EXISTS', p, 'was found in path cache');
+        return true;
+      }
+
+      debug('EXISTS', p, 'was not found');
+      return false;
+    },
     get: function get(p, defaultNs) {
       if (!defaultNs) defaultNs = rootMap._ns;
       if (defaultNs && p.indexOf(':') === -1) {
@@ -410,6 +426,7 @@ function codemap(rootMap) {
   };
 
   app._pathCache = app.plainObject();
+  app.get.exists = app.exists.bind(app);
   app.clearCache();
   app.parseMap(rootMap);
   app.validatePathCache();
