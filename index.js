@@ -19,6 +19,15 @@ function shallowCopy (obj) {
   return ret;
 }
 
+function named (name, fn) {
+  return Object.defineProperty(function () {
+    return fn.apply(this, arguments)
+  }, '_name', {value: name})
+}
+codemap.named = named;
+codemap.container = named.bind(null, 'container');
+codemap.alter = named.bind(null, 'alter');
+
 module.exports = codemap;
 var globalId = module.exports.globalId = 0;
 
@@ -263,7 +272,7 @@ function codemap(rootMap) {
             val = app.merge(val, tmp);
             break;
           case 'alter':
-            if (typeof tmp === 'function' && tmp.name === 'alter') {
+            if (typeof tmp === 'function' && (tmp.name === 'alter' || tmp._name === 'alter')) {
               val = tmp.call(app, val);
             } else val = tmp;
             break;
@@ -287,7 +296,7 @@ function codemap(rootMap) {
       if (pointerValue) {
         return path.get(pointerValue);
       }
-      return typeof path.value === 'function' && path.value.name === 'container'
+      return typeof path.value === 'function' && (path.value.name === 'container' || path.value._name === 'container')
         ? path.value.call(app, path.get, path.set, path.clear)
         : path.value;
     },
