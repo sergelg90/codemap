@@ -54,72 +54,63 @@ function codemap(rootMap) {
     plainObject: function plainObject() {
       return new PlainObject();
     },
+    pathObject: function(path) {
+      app.merge(path, {
+        get: function get(p) {
+          return app.get(p, path.map._ns);
+        },
+        exists: function exists(p) {
+          return app.exists(p, path.map._ns);
+        },
+        set: function set(p, val) {
+          return app.set(p, val, path.map._ns);
+        },
+        clear: function clear(p) {
+          return app.clear(p, path.map._ns);
+        }
+      });
+      path.get.exists = path.exists;
+      return path;
+    },
     parsePath: function parsePath(p, map) {
       var alterMatch = p.match(/^@(?:(.+):)?([^\[]+)(\[(\-?\d*)\])?$/);
       if (alterMatch) {
         var prefix = !alterMatch[1] && map._folder ? map._folder + '.' : '';
-        return {
+        return app.pathObject({
           p: p,
           ns: alterMatch[1] || map._ns,
           pointer: prefix + alterMatch[2],
           op: 'alter',
           weight: alterMatch[3] ? parseInt(alterMatch[3].replace(/\[|\]/g, ''), 10) : 0,
           value: map[p],
-          map: map,
-          get: function get(p) {
-            return app.get(p, map._ns);
-          },
-          set: function set(p, val) {
-            return app.set(p, val, map._ns);
-          },
-          clear: function clear(p) {
-            return app.clear(p, map._ns);
-          }
-        };
+          map: map
+        });
       }
       var pushMatch = p.match(/^(?:(.+):)?([^\[]+)\[(\-?\d*)\]$/);
       if (pushMatch) {
         var prefix = !pushMatch[1] && map._folder ? map._folder + '.' : '';
-        return {
+        return app.pathObject({
           p: p,
           ns: pushMatch[1] || map._ns,
           pointer: prefix + pushMatch[2],
           op: 'push',
           weight: pushMatch[3] ? parseInt(pushMatch[3].replace(/\[|\]/g, ''), 10) : 0,
           value: map[p],
-          map: map,
-          get: function get(p) {
-            return app.get(p, map._ns);
-          },
-          set: function set(p, val) {
-            return app.set(p, val, map._ns);
-          },
-          clear: function clear(p) {
-            return app.clear(p, map._ns);
-          }
-        };
+          map: map
+        });
       }
       var mergeMatch = p.match(/^(?:(.+):)?([^\{]+)\{(\-?\d*)\}$/);
       if (mergeMatch) {
         var prefix = !mergeMatch[1] && map._folder ? map._folder + '.' : '';
-        return {
+        return app.pathObject({
           p: p,
           ns: mergeMatch[1] || map._ns,
           pointer: prefix + mergeMatch[2],
           op: 'merge',
           weight: mergeMatch[3] ? parseInt(mergeMatch[3].replace(/\{|\}/g, ''), 10) : 0,
           value: map[p],
-          map: map,
-          get: function get(p) {
-            return app.get(p, map._ns);
-          },
-          set: function set(p, val) {
-            return app.set(p, val, map._ns);
-          },
-          clear: function clear(p) {
-            return app.clear(p, map._ns);
-          }
-        };
+          map: map
+        });
       }
       if (p.charAt(0) === '_') return null;
       var setMatch = p.match(/^(?:(.+):)?(.*)$/);
@@ -128,23 +119,14 @@ function codemap(rootMap) {
         throw err;
       }
       var prefix = !setMatch[1] && map._folder ? map._folder + '.' : '';
-      return {
+      return app.pathObject({
         p: p,
         ns: setMatch[1] || map._ns,
         pointer: prefix + setMatch[2],
         op: 'set',
         value: map[p],
-        map: map,
-        get: function get(p) {
-          return app.get(p, map._ns);
-        },
-        set: function set(p, val) {
-          return app.set(p, val, map._ns);
-        },
-        clear: function clear(p) {
-          return app.clear(p, map._ns);
-        }
-      };
+        map: map
+      });
     },
     parseMap: function parseMap(map) {
       if (map['_maps']) {
@@ -215,6 +197,22 @@ function codemap(rootMap) {
         var err = new Error('invalid path `' + p + '`');
         throw err;
       }
+    },
+    exists: function exists(p, defaultNs) {
+      if (!defaultNs) defaultNs = rootMap._ns;
+      if (defaultNs && p.indexOf(':') === -1) {
+        p = defaultNs + ':' + p;
+      }
+      debug('EXISTS', p);
+
+      var paths = app.getPathCache(p);
+      if (paths.length) {
+        debug('EXISTS', p, 'was found in path cache');
+        return true;
+      }
+
+      debug('EXISTS', p, 'was not found');
+      return false;
     },
     get: function get(p, defaultNs) {
       if (!defaultNs) defaultNs = rootMap._ns;
@@ -419,6 +417,7 @@ function codemap(rootMap) {
   };
 
   app._pathCache = app.plainObject();
+  app.get.exists = app.exists;
   app.clearCache();
   app.parseMap(rootMap);
   app.validatePathCache();

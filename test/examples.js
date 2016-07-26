@@ -86,5 +86,18 @@ describe('examples', function () {
     app.get('clear.the.thing')
     var val3 = app.get('some.thing.cached');
     assert(val != val3)
-  })
+  });
+  it('exists', function () {
+    var app = codemap(require('./maps/example_exists'));
+    var val = app.get('thing.that.exists');
+    assert.equal(val, 'foo');
+    assert.equal(app.exists('thing.that.exists'), true);
+    assert.equal(app.exists('thing.that.does.not.exist.yet'), false);
+    app.set('thing.that.does.not.exist.yet', 'bar');
+    assert.equal(app.exists('thing.that.does.not.exist.yet'), true);
+    var val2 = app.get('thing.that.does.not.exist.yet');
+    assert.equal(val2, 'bar');
+    var val3 = app.get('test.get.alias');
+    assert.equal(val3, 'alias worked');
+  });
 });
