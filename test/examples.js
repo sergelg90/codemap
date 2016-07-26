@@ -91,11 +91,13 @@ describe('examples', function () {
     var app = codemap(require('./maps/example_exists'));
     var val = app.get('thing.that.exists');
     assert.equal(val, 'foo');
-    assert.equal(app.get.exists('thing.that.exists'), true);
-    assert.equal(app.get.exists('thing.that.does.not.exist.yet'), false);
+    assert.equal(app.exists('thing.that.exists'), true);
+    assert.equal(app.exists('thing.that.does.not.exist.yet'), false);
     app.set('thing.that.does.not.exist.yet', 'bar');
-    assert.equal(app.get.exists('thing.that.does.not.exist.yet'), true);
+    assert.equal(app.exists('thing.that.does.not.exist.yet'), true);
     var val2 = app.get('thing.that.does.not.exist.yet');
     assert.equal(val2, 'bar');
+    var val3 = app.get('test.get.alias');
+    assert.equal(val3, 'alias worked');
   });
 });
